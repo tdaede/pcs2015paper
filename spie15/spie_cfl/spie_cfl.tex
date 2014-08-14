@@ -24,6 +24,7 @@
 \usepackage[]{graphicx}
 \usepackage{amsmath}
 \usepackage{multirow}
+\usepackage{url}
 
 \title{Predicting Chroma from Luma with Frequency Domain Intra Prediction}
 
@@ -65,8 +66,8 @@ This prediction exploits the fact that while RGB to YUV color conversion has
  there is still some correllation locally at the block level\cite{LeeCho09}.
 Previous proposals compute a linear model of the spatial relationship between
  the luma plane (Y) and the two chroma planes (U and V)\cite{JCTVCB021}.
-In Daala this is not possible due to the use of lapped transforms which overlap
- block boundaries\cite{Tran2003}.
+In codecs that use lapped transforms this is not possible since transform
+ support extends across the block boundaries\cite{Tran2003}.
 We design a frequency domain intra predictor for chroma that exploits the same
  local correlation with lower complexity than the spatial predictor and which
  works with lapped transforms.
@@ -86,13 +87,33 @@ We design a frequency domain intra predictor for chroma that exploits the same
 \section{INTRODUCTION}
 \label{sec:intro}  % \label{} allows reference to this section
 
-Still image and Video codecs typically consider the problem of intra-prediction
+Still image and video codecs typically consider the problem of intra-prediction
  in the spatial domain.
 A predicted image is generated on a block-by-block basis using the previously
  reconstructed neighboring blocks for reference, and the residual is encoded
  using standard entropy coding techniques.
 Modern codecs use the boundary pixels of the neighboring blocks along with a
- directional mode to predict the pixel values across the current block.
+ directional mode to predict the pixel values across the current block (e.g.,
+ AVC, HEVC, VP8, WebP, etc.).
+These directional predictors are cheap to compute (often directly copying pixel
+ values or applying a simple linear kernel), exploit local coherency (with low
+ error near the neighbors) and predict hard to code features (extending sharp
+ directional edges across the block).
+
+%In the Daala video codec, we use a reversible lapped transform to 
+In codecs that use lapped transforms these techniques are not applicable (e.g.,
+ VC-1, JPEG-XR, Daala, etc.).
+The challenge here is that the neighboring spatial image data is not available
+ until {\em after} the current block has been decoded and the appropriate
+ unlapping filter has been applied across the block boundaries.
+Figure \ref{fig:decode} shows the decode pipeline of a codec using lapped
+ transforms with a single block size.
+The support used in spatial intra prediction is exactly the region that has not
+ had the unlapping post-filter applied.
+Note that the pre-filter has the effect of decorrelating the image along block
+ boundaries so that the neighboring pixel values before unlapping are
+ particularly unsuitable for use in prediction.
+
 
 \begin{figure}
 \begin{center}
@@ -100,10 +121,22 @@ Modern codecs use the boundary pixels of the neighboring blocks along with a
 \includegraphics[natwidth=1376,natheight=646,width=4in]{daala_decode.png}
 \end{tabular}
 \end{center}
-\caption[example]{\label{fig:decode} State of blocks in Daala decode pipeline.
- Immediate neighbors of the current block (bold lines) cannot be used for
- spatial prediction as they still require post-filtering (dotted lines).}
+\caption[example]{\label{fig:decode} State of blocks in the decode pipeline of
+ a codec using lapped transforms. Immediate neighbors of the current block
+ (bold lines) cannot be used for spatial prediction as they still require post-
+ filtering (dotted lines).}
 \end{figure}
+
+\section{RELATED WORK}
+
+Techniques have been proposed for 
+The work of Xu, Wu and Zhang considers frequency domain intra prediction using
+ non-overlapped blocks\cite{xuwu2009}.
+The experimental Daala video codec uses 
+
+describe a framework for generalizing using the frequency domain coefficients was extended by the Daala codec to allow for 
+
+ unlapping post filter appiledthe neighboring \cite{oliv2011}\cite{xuwu2009}
 
 \begin{figure}
 \begin{center}
@@ -111,12 +144,10 @@ Modern codecs use the boundary pixels of the neighboring blocks along with a
 \includegraphics[natwidth=799,natheight=237,width=4in]{CfL-TF.png}
 \end{tabular}
 \end{center}
-\caption[example]{\label{fig:decode} State of blocks in Daala decode pipeline.
+\caption[example]{\label{fig:tf} State of blocks in Daala decode pipeline.
  Immediate neighbors of the current block (bold lines) cannot be used for
  spatial prediction as they still require post-filtering (dotted lines).}
 \end{figure}
-
-In the Daala video codec, we use a reversible lapped transform to 
 
 \begin{figure}
 \begin{center}
@@ -139,7 +170,7 @@ In the Daala video codec, we use a reversible lapped transform to
 \section{CHROMA PREDICTION}
 \label{sec:chroma}
 
-
+One technique that looks promising 
 
 \begin{align*}
 \alpha & = \frac{I\cdot\displaystyle\sum_i^I x_i\cdot y_i - \displaystyle\sum_i^I x_i\displaystyle\sum_i^I y_i}{I\cdot\displaystyle\sum_i^I x_i\cdot x_i - \left(\displaystyle\sum_i^I y_i\right)^2}, & \beta & = \frac{\displaystyle\sum_i^I y_i -\alpha\cdot\displaystyle\sum_i^I x_i}{I}
@@ -174,10 +205,15 @@ $16\times 16$\footnotemark[1] & 66 & 131 & 26 & 51 \\
 \footnotetext[1]{Daala does not currently handle $32\times 32$ luma blocks but will likely add support in the future.}
 \cite{valin2013high}
 
+\section{IMPLEMENTATION}
+
+This work is part of the Daala project\cite{DaalaWebsite}.
+The full source code, including all of the CfL work described in this paper is
+ available in the project git repository\cite{DaalaGit}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\acknowledgments     %>>>> equivalent to \section*{ACKNOWLEDGMENTS}       
- 
-This unnumbered section is used to identify those who have aided the authors in understanding or accomplishing the work presented and to acknowledge sources of funding.  
+%\acknowledgments     %>>>> equivalent to \section*{ACKNOWLEDGMENTS}       
+%This unnumbered section is used to identify those who have aided the authors in understanding or accomplishing the work presented and to acknowledge sources of funding.  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% References %%%%%
