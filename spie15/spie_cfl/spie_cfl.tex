@@ -131,8 +131,9 @@ Work has been done to use intra prediction with lapped transforms.
 Modifying AVC, de Oliveira and Pesquet showed that it was possible to use the
  boundary pixels just outside the lapped region to use 4 of the 8 directional
  intra prediction modes with lapped transforms\cite{oliv2011}.
-The work of Xu, Wu and Zhang considers prediction as a transform and describes
- a frequency domain intra prediction using non-overlapped blocks\cite{xuwu2009}.
+The work of Xu, Wu and Zhang considers prediction as a transform and proposes
+ a frequency domain intra prediction method using non-overlapped
+ blocks\cite{xuwu2009}.
 The experimental Daala video codec extends this idea using machine learning to
  train sparse intra predictors\cite{DaalaDemo2}.
 However this technique is computationally expensive (4 multiplies per
@@ -196,7 +197,7 @@ C_{DC} &= \alpha_{DC}\cdot L_{DC} + \beta_{DC} \\
 C_{AC}(u,v) &= \alpha_{AC}\cdot L_{AC}(u,v)
 \end{align*}
 where the $\alpha_{DC}$ and $\beta_{DC}$ are computed using the linear
- regression in (\ref{eqn:fit}) with the DC coefficients of the three
+ regression in Equation (\ref{eqn:fit}) with the DC coefficients of the three
  neighboring blocks: U, L and UL.
 When estimating $C_{AC}(u,v)$ we can omit the constant offset $\beta_{AC}$
  as we expect the AC coefficients to be zero mean.
@@ -243,8 +244,8 @@ For example, in the Daala video codec which uses lapped transforms, the
 In 4:2:0, when an 8x8 block of luma image data is split into four 4x4 blocks,
  the corresponding 4x4 chroma image data is coded as a single 4x4 block.
 
-This is a problem for FD-CfL as it requires the reconstructed luma frequency
- domain coefficients to cover the same spatial extent.
+This is a problem for FD-CfL as it requires the reconstructed luma
+ frequency-domain coefficients to cover the same spatial extent.
 In Daala this is overcome by borrowing a technique from the Opus audio
  codec\cite{valin2013high}.
 Using Time-Frequency resolution switching (TF) it is possible to trade off
@@ -269,7 +270,30 @@ The low frequency (LF) coefficients are then used with FD-CfL, see
 
 \section{COMPLEXITY COMPARISON}
 
-\begin{table}
+Both the spatial and frequency domain chroma-from-luma techniques have the
+ property that once the model parameters $\alpha$ and $\beta$ have been
+ determined the entire chroma block can be computed with one multiply and one
+ add per pixel.
+This is far better than the frequency domain intra prediction used to predict
+ the luma plane in Daala which uses 4 multiplies and 4 adds\cite{DaalaDemo2}.
+An important question to answer is how does the computational complexity of
+ the model fitting step in FD-CfL compare to the HEVC proposal\cite{JCTVCB021}.
+Note that the HEVC proposal required resampling the entire luma block for 4:2:0
+ image data, a process which is roughly as expensive as a TF-merge and
+ is necessary for all luma block sizes (not just at the smallest block size).
+
+To answer this question, Table \ref{tbl:comp} is provided which compares just
+ the cost of fitting the chroma-from-luma model.
+An interesting feature of the FD-CfL algorithm is that the cost to fit the
+ model is independent of the block size, as we only consider a small portion
+ of the frequency domain coefficients.
+In the frequency domain we use 12 $(L_i,C_i)$ pairs (the 4 LF coefficients
+ from the 3 neighboring blocks), versus $2*N$ pairs in the spatial domain ($N$
+ from each of the boardering of left and up blocks).
+This means that for all chroma block sizes larger than 4x4, model fitting in
+ the frequency domain is actually cheaper than in the spatial domain.
+
+\begin{table}[h]
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|}
 \hline
@@ -277,18 +301,18 @@ The low frequency (LF) coefficients are then used with FD-CfL, see
 \cline{2-5}
  & Mults & Adds & Mults & Adds \\
 \hline
-$N\times N$ & $4*N+2$ & $8*N+3$ & $2*12+2$ & $4*12+3$ \\
+$N\times N$ & $4*N+2$ & $8*N+3$ & $2*12+5$ & $4*12+5$ \\
 \hline
-$4\times 4$ & 18 & 35 & 26 & 51 \\
+$4\times 4$ & 18 & 35 & 29 & 53 \\
 \hline
-$8\times 8$ & 34 & 67 & 26 & 51 \\
+$8\times 8$ & 34 & 67 & 29 & 53 \\
 \hline
-$16\times 16$\footnotemark[1] & 66 & 131 & 26 & 51 \\
+$16\times 16$\footnotemark[1] & 66 & 131 & 29 & 53 \\
 \hline
 \end{tabular}
 \end{center}
-\caption[example]{\label{tbl:comp} Comparison of (a) the original uncompressed
- image with composite images of (b) reconstructed luma and predicted chroma}
+\caption[example]{\label{tbl:comp} Comparison of cost to fit the model in
+ Equation (\ref{eqn:fit}) using spatial and frequency domain chroma-from-luma.}
 \end{table}
 \footnotetext[1]{Daala does not currently handle $32\times 32$ luma blocks but will likely add support in the future.}
 
