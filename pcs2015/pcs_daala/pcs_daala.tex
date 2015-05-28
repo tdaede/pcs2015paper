@@ -360,7 +360,7 @@
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{Using Daala Intra Frames for Still Picture Coding}
+\title{Daala Intra Frame Coding}
 
 
 % author names and affiliations
@@ -455,30 +455,16 @@ The Daala video codec is a joint research effort between Xiph.Org and Mozilla
 In working to produce a royalty free video codec, new coding techniques have
  been developed to replace those used in the traditional block-based video
  codec pipeline.
-These techniques, while not completely finished, already demonstrate that it
- is possible to deliver a modern video codec with performance and features
- for use on the web.
+While incomplete, the codec already demonstrates excellent performance,
+ validating the presented techniques.
 
-All video codecs have within them (in some form) the ability to code a still
- picture when no prior information exists for prediction, e.g., at stream
- initialization, for scene changes, for loss robustness, etc., and in Daala
- these are called intra frames.
-As the bitstreams of other video codecs have stabalized, new standards in still
- picture coding have been proposed most notably with WebP based on VP8
- \cite{WebPWebsite} and BPG based on H.265 \cite{BPGWebsite}.
-%Although the Daala project does not intend to produce a new still picture
-% format as a research biproduct, nevertheless we regularly look at the coding
-% performance of still images a improvments there directly translate to better
-% video coding performance.
-
-This paper outlines the coding techniques and approach used in Daala to code
- just the intra frames.
+This paper outlines the coding techniques and approach used in Daala's intra
+ frame compression.
 It includes a brief experimental study comparing still image performance
  against other lossy still picture codecs, e.g., JPEG, WebP, and BPG, using
  two quality metrics: PSNR and Fast MS-SSIM\cite{Chen2010}.
-In the future work section we describe what features are missing from Daala
- that would be required by an effort to standardize Daala intra frames as a
- stand alone still picture format.
+In the future work section we describe what additional improvements can be made
+ to Daala's intra prediction to further improve coding efficiency.
 
 \section{Coding Techniques}
 
