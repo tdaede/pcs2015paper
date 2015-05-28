@@ -638,24 +638,6 @@ This eliminates the need for a separate deblocking filter.
 \subsection{Gain-Shape Quantization}
 \label{sec:pvq}
 
-Most modern video and still image codecs use scalar quantization as a ``lossy''
- way of reducing the amount of information needed to code a block.
-After the block coefficients have been transformed into the frequency-domain,
- they are each quantized to an integer index which is entropy coded.
-In the decoder the transform coefficients are reconstructed by reversing the
- quantization.
-For a coefficient $C_i$ and quantization step size $Q_i$, the quantization
- index $\gamma_i$ and reconstructed coefficient $\hat{C_i}$ can be found by
-\begin{align}
-\gamma_i & = \lfloor C_i / Q_i\rfloor \\
-\hat{C_i} & = \gamma_i\cdot Q_i
-\end{align}
-Note that when the quantization step size is large (e.g., at low rates) the
- smaller, high frequency coefficients go to zero.
-While good for compression (many codecs will run-length encode a string of
- zeros), this has the effect of low-passing the block and removing much of the
- texture from the image.
-
 An alternative to scalar quantization is to use vector quantization (VQ).
 Here the quantization index $\gamma$ no longer represents a single coefficient,
  but rather an entire vector of coefficients.
