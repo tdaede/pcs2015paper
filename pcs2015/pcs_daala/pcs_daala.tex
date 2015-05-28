@@ -560,25 +560,17 @@ Below
 \label{sec:tdlt}
 
 Lapped transforms were proposed for video coding as early as 1989 \cite{journals/tsp/MalvarS89}.
-Like the loop filters more commonly found in recent video coding standards,
- Time-Domain Lapped Transforms (TDLTs) use a post-processing filter that runs between block edges to reduce or
- eliminate blocking artifacts.
-Unlike a loop filter, the TDLT filter is invertible, allowing the encoder to
- run the inverse filter on the input video.
-This decorrelates blocks before they are passed through a normal block
- transform and quantization step, improving coding gain (which helps in both
- smooth and highly textured areas), in addition to reducing blocking artifacts.
+They have higher coding gain and reduce or eliminate blocking artifacts, when
+ compared to a traditional DCT.
+Time-Domain Lapped Transforms (TDLTs), as used in Daala, implement the transform
+ using an invertible filter placed before the DCT, and after the inverse DCT.
 
-The Time-Domain Lapped Transform can be viewed as a set of pre and post
- filters to an existing block-based DCT transform.
-The idea is to place an invertible filter along the block boundaries outside
- an existing block-based DCT encoder.
 
 \begin{figure}[h]
 \begin{center}
 \noindent
   \includegraphics[natwidth=876,natheight=314,width=3in]{lapping.png}
-  \caption{Band definition for 4x4, 8x8 and 16x16 blocks in Daala.}\label{fig:bands}
+  \caption{1D lapped transform implementation in Daala.}\label{fig:bands}
 \end{center}
 \end{figure}
 
