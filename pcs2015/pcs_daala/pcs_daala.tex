@@ -475,7 +475,7 @@ This paper outlines the coding techniques and approach used in Daala to code
  just the intra frames.
 It includes a brief experimental study comparing still image performance
  against other lossy still picture codecs, e.g., JPEG, WebP, and BPG, using
- two quality metrics: PSNR and Fast MS-SSIM.
+ two quality metrics: PSNR and Fast MS-SSIM\cite{Chen2010}.
 In the future work section we describe what features are missing from Daala
  that would be required by an effort to standardize Daala intra frames as a
  stand alone still picture format.
@@ -1073,13 +1073,22 @@ where Q is the image quality (quantization step size), σ2 is the mean squared d
 
 \section{Experimental Evaluation}
 
-To compare the 
+To compare the Daala intra frame coding to other still image formats a small
+ experimental study was conducted using the 8 manditory images provided as
+ part of the Image Compression Evaluation feature session at PCS 2015
+ \cite{pcs2015website}.
+The original ~2 mega-pixel 8-bit RGB images were converted to 8-bit YUV and
+ downsampled to 4:2:0.
+The resulting images were fed through Daala and 3 other lossy image codecs
+ at a wide variety of quality factors.
+A graph of the rate-distortion curves for PSNR and Fast MS-SSIM can be found
+ in Figures \ref{fig:psnr} and \ref{fig:fastssim} respectively.
 
 \begin{figure}[h]
 \begin{center}
 \noindent
   \includegraphics[width=3in]{pcs2015-psnr}
-  \caption{Example of a figure caption.}\label{Fig1Label}
+  \caption{Rate-Distortion comparison using PSNR.}\label{fig:psnr}
 \end{center}
 \end{figure}
 
@@ -1087,11 +1096,11 @@ To compare the
 \begin{center}
 \noindent
   \includegraphics[width=3in]{pcs2015-fastssim}
-  \caption{Example of a figure caption.}\label{Fig1Label}
+  \caption{Rate-distortion comparison using Fast MS-SSIM.}\label{fig:fastssim}
 \end{center}
 \end{figure}
 
-* Describe why PSNR is not something we optimize for (add comparison with End Of Show to slides)
+%* Describe why PSNR is not something we optimize for (add comparison with End Of Show to slides)
 
 
 
